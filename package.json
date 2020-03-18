@@ -1,0 +1,20 @@
+{
+  "name": "ringoffireomp-server",
+  "version": "0.0.1",
+  "description": "The server for a rudimentary version of the drinking game ring of fire which can be played without face to face contact",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RobHallArt/RingOfFireOMP-Server.git"
+  },
+  "author": "Robert Hall",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/RobHallArt/RingOfFireOMP-Server/issues"
+  },
+  "homepage": "https://github.com/RobHallArt/RingOfFireOMP-Server#readme"
+}
