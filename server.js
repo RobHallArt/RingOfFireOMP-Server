@@ -19,7 +19,7 @@ function newConnection(socket){
     socket.on('userConfirmed', function(data){
         console.log("NewUserConfirmation");
         userArray.push(data);
-        for(var i =0; i<userArray.length;i++){
+        for(var i = 0; i<userArray.length;i++){
             console.log(userArray[i].nickname);
         }
         socket.emit('usersUpdate',userArray);
