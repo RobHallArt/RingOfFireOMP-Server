@@ -31,14 +31,23 @@ function newConnection(socket){
         for(var i = 0; i<userArray.length;i++){
             console.log(userArray[i].nickname);
         }
-        socket.broadcast.emit('usersUpdate',userArray);
-
-        /// LOOK ABOVE HERE THE LINE ABOVE WATCH DAN SCHIFFMAN VIDEO ON HOW TO SEND SAME STUFF TO ALL CLIENTS SOCKET.IO
+        io.sockets.emit('usersUpdate',userArray);
 
     });
 
     socket.on('TEST', (data)=>{
         console.log('TEST'+ data);
+    });
+
+    socket.on('disconnect',(reason)=>{
+        console.log('DISCONNECT',socket.id);
+        for(var i = 0; i<userArray.length; i++){
+            if(userArray[i].ID == socket.id){
+                console.log('userLost', userArray[i].nickname);
+                io.sockets.emit('userLost', socket.id);
+                userArray.splice(i,1);
+            }
+        }
     });
     
 };
