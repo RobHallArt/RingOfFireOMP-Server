@@ -35,6 +35,23 @@ function newConnection(socket){
 
     });
 
+    socket.on('userUpdate', function(data){
+        //console.log("userUpdate");
+        //search through things and check who updated and update them.
+        for(var i = 0; i<userArray.length; i++){
+            //console.log(data.ID,userArray[i].ID);
+            if(data.ID == userArray[i].ID){
+                console.log(data.nickname," Updated");
+                userArray[i] = data;
+            }
+        }
+        //for(var i = 0; i<userArray.length;i++){
+        //    console.log(userArray[i].nickname);
+        //}
+        io.sockets.emit('usersUpdate',userArray);
+
+    });
+
     socket.on('TEST', (data)=>{
         console.log('TEST'+ data);
     });
