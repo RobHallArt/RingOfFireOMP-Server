@@ -41,7 +41,7 @@ function newConnection(socket){
         for(var i = 0; i<userArray.length; i++){
             //console.log(data.ID,userArray[i].ID);
             if(data.ID == userArray[i].ID){
-                console.log(data.nickname," Updated");
+                console.log(data.nickname," Updated + isReady? : ",data.isReady);
                 userArray[i] = data;
             }
         }
