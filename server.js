@@ -16,11 +16,62 @@ var programState = 'Lobby';
 
 var userArray =[];
 
+var cardDeck = {
+    cards: [],
+    resetDeck: function() {
+        var suits = ['clubs', 'diamonds', 'hearts', 'spades'];
+        var ranks = ['ace', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'jack', 'queen', 'king'];
+        var values = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
+        for (var i = 0; i < suits.length; i++) {
+            for (var j = 0; j < ranks.length; j++) {
+                this.cards.push(this.cardConstructor(suits[i], ranks[j], values[j]));
+            }
+        }
+    },
+
+    shuffleDeck: function() {
+       var location1, location2, tmp;
+       for (var i = 0; i < 1000; i++) {
+           location1 = Math.floor((Math.random() * this.cards.length));
+           location2 = Math.floor((Math.random() * this.cards.length));
+           tmp = this.cards[location1];
+           this.cards[location1] = this.cards[location2];
+           this.cards[location2] = tmp;
+        }
+    },
+
+    logCards: function(){
+        for(var i = 0; i<this.cards.length; i++){
+            console.log(this.cards[i].suit,this.cards[i].rank);
+        }
+    },
+
+    cardConstructor: function(suitin,rankin,valuein){
+        var card = {
+            suit: suitin,
+            rank: rankin,
+            value: valuein
+        }
+
+        return card;
+
+    },
+
+    pickAndRemoveCard: function(){
+        var cardToReturn = this.cards[this.cards.length-1];
+        this.cards.splice(this.cards.length-1,1);
+        return cardToReturn;
+    }
+}
+
 app.use(express.static('../RingOfFireOMP-Client'));
 console.log("Listening on 3000");
 for(var i = 0; i<networkInterfaces.en1.length;i++){
     console.log( networkInterfaces.en1[i].address );
 }
+
+cardDeck.resetDeck();
+cardDeck.shuffleDeck();
 
 io.sockets.on('connection', newConnection);
 
@@ -95,4 +146,6 @@ function nextTurn(){
     currentTurn = (currentTurn+1)%userArray.length;
 
 }
+
+
 
