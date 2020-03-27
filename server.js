@@ -20,7 +20,7 @@ var cardDeck = {
     cards: [],
     resetDeck: function() {
         var suits = ['clubs', 'diamonds', 'hearts', 'spades'];
-        var ranks = ['ace', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'jack', 'queen', 'king'];
+        var ranks = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
         var values = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
         for (var i = 0; i < suits.length; i++) {
             for (var j = 0; j < ranks.length; j++) {
@@ -112,12 +112,16 @@ function newConnection(socket){
         }
     });
 
-    socket.on('TEST', (data)=>{
-        console.log('TEST'+ data);
+    socket.on('revealCard', (data)=>{
+        console.log('cardUnveilded');
+        userArray[previousTurn].cardRevealed = true;
+        io.sockets.emit('usersUpdate',userArray);
+
     });
 
     socket.on('turnFinished', (data)=>{
         userArray[previousTurn].isActive = false;
+        userArray[previousTurn].cardRevealed = false;
         io.sockets.emit('usersUpdate',userArray);
         nextTurn();
     });
@@ -131,6 +135,14 @@ function newConnection(socket){
                 userArray.splice(i,1);
             }
         }
+        if(userArray.length == 0){
+            programState = 'Lobby';
+            console.log('Everybody Disconnected : Resetting');
+            currentTurn = 0;
+            previousTurn = 0;
+            cardDeck.resetDeck();
+            cardDeck.shuffleDeck();
+        }
     });
     
 };
@@ -140,8 +152,9 @@ function nextTurn(){
         userArray[i].isReady = false;           // not sure if necessary just yet.
     }
     userArray[currentTurn].isActive = true;
+    userArray[currentTurn].lastCard = cardDeck.pickAndRemoveCard();
     io.sockets.emit('usersUpdate',userArray);
-    io.to(`${userArray[currentTurn].ID}`).emit('yourTurn',userArray[currentTurn].nickname);
+    io.to(`${userArray[currentTurn].ID}`).emit('yourTurn',userArray[currentTurn].lastCard);
     previousTurn = currentTurn;
     currentTurn = (currentTurn+1)%userArray.length;
 
