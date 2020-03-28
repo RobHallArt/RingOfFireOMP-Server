@@ -14,7 +14,7 @@ var previousTurn = 0;
 
 var programState = 'Lobby';
 
-var userArray =[];
+var userArray = [];
 
 var cardDeck = {
     cards: [],
@@ -63,6 +63,8 @@ var cardDeck = {
         return cardToReturn;
     }
 }
+
+var drinkerArray = [];
 
 app.use(express.static('../RingOfFireOMP-Client'));
 console.log("Listening on 3000");
@@ -123,7 +125,26 @@ function newConnection(socket){
         userArray[previousTurn].isActive = false;
         userArray[previousTurn].cardRevealed = false;
         io.sockets.emit('usersUpdate',userArray);
-        nextTurn();
+        console.log('turnFinished', data);
+        switch(userArray[previousTurn].lastCard.rank){
+            case '2':
+                sendDrink(data);
+                break;
+            default:
+                nextTurn();
+        }
+        //nextTurn();
+    });
+
+    socket.on('drinkFinished',(drinkerSocketID)=>{
+        for(var i = 0; i<drinkerArray.length; i++){
+            if(drinkerArray[i] == drinkerSocketID){
+                drinkerArray.splice(i,1);
+            }
+        }
+        if(drinkerArray.length == 0){
+            nextTurn();
+        }
     });
 
     socket.on('disconnect',(reason)=>{
@@ -159,6 +180,23 @@ function nextTurn(){
     currentTurn = (currentTurn+1)%userArray.length;
 
 }
+
+function sendDrink(playerID){
+    //check for mates here (ADD LATER)
+    console.log('sending drink to', playerID);
+    io.to(`${playerID}`).emit('drink',false); // false because not drinking as a mate
+    drinkerArray.push(playerID);
+    // lookup this ID in user array and check for mates.
+
+}
+// I feel like the way this should work is that the everything happens as normal for the turn.
+// Once the card is clicked it triggers a function client side which does some stuff and generates
+// an output in the form of an object.
+
+// This object comes back here and updates some objects and triggers some drinks to send off
+// drink object that gets added to an array as they are sent off then as it comes back with a
+// success we can remove it from the array
+// when the array hits 0 then we call next turn.
 
 
 
