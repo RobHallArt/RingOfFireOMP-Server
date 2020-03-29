@@ -22,6 +22,7 @@ var cardDeck = {
         var suits = ['clubs', 'diamonds', 'hearts', 'spades'];
         var ranks = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
         var values = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
+        this.cards = [];
         for (var i = 0; i < suits.length; i++) {
             for (var j = 0; j < ranks.length; j++) {
                 this.cards.push(this.cardConstructor(suits[i], ranks[j], values[j]));
@@ -60,6 +61,7 @@ var cardDeck = {
     pickAndRemoveCard: function(){
         var cardToReturn = this.cards[this.cards.length-1];
         this.cards.splice(this.cards.length-1,1);
+        console.log(this.cards.length, ' Cards Left');
         return cardToReturn;
     }
 }
@@ -130,6 +132,50 @@ function newConnection(socket){
             case '2':
                 sendDrink(data);
                 break;
+
+            case '3':
+                sendDrink(userArray[previousTurn].ID);
+                break;
+
+            case '4':
+                for(var i =0; i<userArray.length; i++){
+                    if(userArray[i].gender == 'FEMALE'){
+                        sendDrink(userArray[i].ID);
+                    }
+                }
+                break;
+
+            case '5':
+                for(var i = 0; i< userArray.length; i++){
+                    userArray[i].isThumbMaster = false;
+                }
+                userArray[previousTurn].isThumbMaster = true;
+                io.sockets.emit('usersUpdate',userArray);
+                nextTurn();
+                break;
+
+            case '6':
+                for(var i =0; i<userArray.length; i++){
+                    if(userArray[i].gender == 'MALE'){
+                        sendDrink(userArray[i].ID);
+                    }
+                }
+                break;
+
+            case '7':
+                for(var i = 0; i< userArray.length; i++){
+                    userArray[i].isHeavenMaster = false;
+                }
+                userArray[previousTurn].isHeavenMaster = true;
+                io.sockets.emit('usersUpdate',userArray);
+                nextTurn();
+                break;
+
+            case '8':
+                userArray[previousTurn].mates.push(data);
+                nextTurn();
+                break;
+
             default:
                 nextTurn();
         }
@@ -137,6 +183,7 @@ function newConnection(socket){
     });
 
     socket.on('drinkFinished',(drinkerSocketID)=>{
+        console.log('Drink drinkFinished', socketToNickname(drinkerSocketID));
         for(var i = 0; i<drinkerArray.length; i++){
             if(drinkerArray[i] == drinkerSocketID){
                 drinkerArray.splice(i,1);
@@ -163,6 +210,7 @@ function newConnection(socket){
             previousTurn = 0;
             cardDeck.resetDeck();
             cardDeck.shuffleDeck();
+            drinkerArray = [];
         }
     });
     
@@ -183,11 +231,31 @@ function nextTurn(){
 
 function sendDrink(playerID){
     //check for mates here (ADD LATER)
-    console.log('sending drink to', playerID);
+    console.log('sending drink to', socketToNickname(playerID));
     io.to(`${playerID}`).emit('drink',false); // false because not drinking as a mate
     drinkerArray.push(playerID);
+
+    for(var i = 0; i<userArray.length; i++){
+        if(userArray[i].ID == playerID){
+            for(var j = 0; j<userArray[i].mates.length; j++){
+                console.log('sending mate drink to', socketToNickname(userArray[i].mates[j]));
+                io.to(`${userArray[i].mates[j]}`).emit('drink',true); // false because not drinking as a mate
+                drinkerArray.push(userArray[i].mates[j]);
+            }
+        }
+    }
     // lookup this ID in user array and check for mates.
 
+}
+
+function socketToNickname(userSocketID){
+    for(var i = 0; i<userArray.length; i++){
+        if(userArray[i].ID == userSocketID){
+            return userArray[i].nickname;
+            break;
+        }
+    }
+    return 'Client Not Found';
 }
 // I feel like the way this should work is that the everything happens as normal for the turn.
 // Once the card is clicked it triggers a function client side which does some stuff and generates
