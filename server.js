@@ -68,7 +68,7 @@ var cardDeck = {
 
 var drinkerArray = [];
 
-app.use(express.static('../RingOfFireOMP-Client'));
+app.use(express.static('RingOfFireOMP-Client'));
 console.log("Listening on 3000");
 for(var i = 0; i<networkInterfaces.en1.length;i++){
     console.log( networkInterfaces.en1[i].address );
