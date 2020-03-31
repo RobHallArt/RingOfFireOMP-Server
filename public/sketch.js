@@ -823,17 +823,17 @@ function createUserSprite(datain){
 }
 
 function createStartScreen(){
-    const playButtonTextureStandard = PIXI.Texture.from('assets/1x/PlayStandard.png');
-    const playButtonTextureHover = PIXI.Texture.from('assets/1x/PlayBright.png');
-    const maleButtonTextureDark = PIXI.Texture.from('assets/1x/MaleDark.png');
-    const maleButtonTextureStandard = PIXI.Texture.from('assets/1x/MaleStandard.png');
-    const maleButtonTextureBright = PIXI.Texture.from('assets/1x/MaleBright.png');
-    const maleButtonTextureHover = PIXI.Texture.from('assets/1x/MaleHover.png');
-    const femaleButtonTextureDark = PIXI.Texture.from('assets/1x/FemaleDark.png');
-    const femaleButtonTextureStandard = PIXI.Texture.from('assets/1x/FemaleStandard.png');
-    const femaleButtonTextureBright = PIXI.Texture.from('assets/1x/FemaleBright.png');
-    const femaleButtonTextureHover = PIXI.Texture.from('assets/1x/FemaleHover.png');
-    const headlineBGTexture = PIXI.Texture.from('assets/1x/title.png');
+    const playButtonTextureStandard = PIXI.Texture.from('assets/1x/playStandard.png');
+    const playButtonTextureHover = PIXI.Texture.from('assets/1x/playBright.png');
+    const maleButtonTextureDark = PIXI.Texture.from('assets/1x/maleDark.png');
+    const maleButtonTextureStandard = PIXI.Texture.from('assets/1x/maleStandard.png');
+    const maleButtonTextureBright = PIXI.Texture.from('assets/1x/maleBright.png');
+    const maleButtonTextureHover = PIXI.Texture.from('assets/1x/maleHover.png');
+    const femaleButtonTextureDark = PIXI.Texture.from('assets/1x/femaleDark.png');
+    const femaleButtonTextureStandard = PIXI.Texture.from('assets/1x/femaleStandard.png');
+    const femaleButtonTextureBright = PIXI.Texture.from('assets/1x/femaleBright.png');
+    const femaleButtonTextureHover = PIXI.Texture.from('assets/1x/femaleHover.png');
+    const headlineBGTexture = PIXI.Texture.from('assets/1x/Title.png');
 
 
 
