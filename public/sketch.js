@@ -34,6 +34,9 @@
     // ()on phone version we don't actually need to show everyone, just that person who is currently active.
     // ()where everyone should be displayed, we could use a scrollable list.
 
+    // MOST IMPORTANT! SERVER SHOULD LOOK UP OUR PUBLIC IP AND USE THAT TO START THE SERVERS AND STUFF
+    // CHANGE THE Webserver to happen on standard port if possible.
+
 var localplayer = {
     nickname : "",
     imagePath : "",
