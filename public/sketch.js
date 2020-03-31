@@ -556,7 +556,7 @@ function programStateChange(newState){
 }
 
 function initStarburstBG(){
-    const starburstBGTexture = PIXI.Texture.from('assets/3x/starburst@3x.png');
+    const starburstBGTexture = PIXI.Texture.from('assets/3x/Starburst@3x.png');
 
     const starburstBG = new PIXI.Sprite(starburstBGTexture);
 
