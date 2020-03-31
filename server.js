@@ -110,9 +110,13 @@ function newConnection(socket){
         }
         console.log("Are We Ready? : ", allReady);
         if(allReady){
-            io.sockets.emit('programStateUpdate', 'Game'); console.log("Going to game Mode");
-            nextTurn();
-            // at some point actually change programMode to game and do 
+            if(userArray.length > 2){
+                io.sockets.emit('programStateUpdate', 'Game'); console.log("Going to game Mode");
+                nextTurn();
+                // at some point actually change programMode to game and do 
+            } else {
+                console.log("Not Enough Players");
+            }
         }
     });
 
@@ -143,6 +147,9 @@ function newConnection(socket){
                         sendDrink(userArray[i].ID);
                     }
                 }
+                if(drinkerArray == 0){
+                    nextTurn();
+                }
                 break;
 
             case '5':
@@ -160,6 +167,9 @@ function newConnection(socket){
                         sendDrink(userArray[i].ID);
                     }
                 }
+                if(drinkerArray == 0){
+                    nextTurn();
+                }
                 break;
 
             case '7':
@@ -172,7 +182,9 @@ function newConnection(socket){
                 break;
 
             case '8':
-                userArray[previousTurn].mates.push(data);
+                if(data != 'NONELEFT'){
+                    userArray[previousTurn].mates.push(data);
+                }
                 nextTurn();
                 break;
 
@@ -231,16 +243,21 @@ function nextTurn(){
 
 function sendDrink(playerID){
     //check for mates here (ADD LATER)
-    console.log('sending drink to', socketToNickname(playerID));
-    io.to(`${playerID}`).emit('drink',false); // false because not drinking as a mate
-    drinkerArray.push(playerID);
+    if(!isUserAlreadyDrinking(playerID)){
+        console.log('sending drink to', socketToNickname(playerID));
+        io.to(`${playerID}`).emit('drink',false); // false because not drinking as a mate
+        drinkerArray.push(playerID);
+    }
+   
 
     for(var i = 0; i<userArray.length; i++){
         if(userArray[i].ID == playerID){
             for(var j = 0; j<userArray[i].mates.length; j++){
-                console.log('sending mate drink to', socketToNickname(userArray[i].mates[j]));
-                io.to(`${userArray[i].mates[j]}`).emit('drink',true); // false because not drinking as a mate
-                drinkerArray.push(userArray[i].mates[j]);
+                if(!isUserAlreadyDrinking(playerID)){
+                    console.log('sending mate drink to', socketToNickname(userArray[i].mates[j]));
+                    io.to(`${userArray[i].mates[j]}`).emit('drink',true); // false because not drinking as a mate
+                    drinkerArray.push(userArray[i].mates[j]);
+                }
             }
         }
     }
@@ -256,6 +273,17 @@ function socketToNickname(userSocketID){
         }
     }
     return 'Client Not Found';
+}
+
+function isUserAlreadyDrinking(userID){
+    var isInArray = false
+    for(var i = 0; i<drinkerArray.length; i++){
+        if(userID == drinkerArray[i]){
+            isInArray = true;
+            console.log("Tried to send multiple drinks to ", socketToNickname(userID));
+        }
+    }
+    return isInArray;
 }
 // I feel like the way this should work is that the everything happens as normal for the turn.
 // Once the card is clicked it triggers a function client side which does some stuff and generates
