@@ -5,9 +5,9 @@ var app = express();
 var server = app.listen(3000);
 var io = socket(server);
 
-var os = require( 'os' );
+//var os = require( 'os' );
 
-var networkInterfaces = os.networkInterfaces( );
+//var networkInterfaces = os.networkInterfaces( );
 
 var currentTurn = 0;
 var previousTurn = 0;
@@ -69,10 +69,10 @@ var cardDeck = {
 var drinkerArray = [];
 
 app.use(express.static('RingOfFireOMP-Client'));
-console.log("Listening on 3000");
-for(var i = 0; i<networkInterfaces.en1.length;i++){
-    console.log( networkInterfaces.en1[i].address );
-}
+//console.log("Listening on 3000");
+//for(var i = 0; i<networkInterfaces.en1.length;i++){
+//    console.log( networkInterfaces.en1[i].address );
+//}
 
 cardDeck.resetDeck();
 cardDeck.shuffleDeck();
