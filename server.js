@@ -14,6 +14,8 @@ var previousTurn = 0;
 
 var programState = 'Lobby';
 
+var kingsRemaining = 4;
+
 var userArray = [];
 
 var cardDeck = {
@@ -61,6 +63,12 @@ var cardDeck = {
     pickAndRemoveCard: function(){
         var cardToReturn = this.cards[this.cards.length-1];
         this.cards.splice(this.cards.length-1,1);
+        if(cardToReturn.rank == 'K'){
+            kingsRemaining--;
+        }
+        if(kingsRemaining == 0){
+            io.sockets.emit('lastCard', socket.id);
+        }
         console.log(this.cards.length, ' Cards Left');
         return cardToReturn;
     }
@@ -69,10 +77,7 @@ var cardDeck = {
 var drinkerArray = [];
 
 app.use(express.static('public'));
-console.log("Listening on 80");
-//for(var i = 0; i<networkInterfaces.en1.length;i++){
-//    console.log( networkInterfaces.en1[i].address );
-//}
+console.log("Listening on 3000");
 
 cardDeck.resetDeck();
 cardDeck.shuffleDeck();
@@ -82,14 +87,18 @@ io.sockets.on('connection', newConnection);
 function newConnection(socket){
     console.log('New Connection ' + socket.id);
     
-    
     socket.on('userConfirmed', function(data){
         console.log("NewUserConfirmation");
-        userArray.push(data);
-        for(var i = 0; i<userArray.length;i++){
-            console.log(userArray[i].nickname);
+        if(programState == 'Lobby'){
+            userArray.push(data);
+            for(var i = 0; i<userArray.length;i++){
+                console.log(userArray[i].nickname);
+            }
+            io.sockets.emit('usersUpdate',userArray);
+        } else {
+            io.to(`${data.ID}`).emit('reset', 'NOTHINGUSEFUL');
+            console.log('UserTriedToLogin');
         }
-        io.sockets.emit('usersUpdate',userArray);
 
     });
 
@@ -112,8 +121,8 @@ function newConnection(socket){
         if(allReady){
             if(userArray.length > 2){
                 io.sockets.emit('programStateUpdate', 'Game'); console.log("Going to game Mode");
+                programState = 'Game';
                 nextTurn();
-                // at some point actually change programMode to game and do 
             } else {
                 console.log("Not Enough Players");
             }
@@ -188,6 +197,17 @@ function newConnection(socket){
                 nextTurn();
                 break;
 
+            case 'K':
+                if(kingsRemaining == 0){
+                    for(var i = 0; i<userArray.length; i++){
+                        sendDrink(userArray[i].ID);
+                    }
+                    programState = 'GameOver';
+                } else {
+                    nextTurn();
+                }
+                break;
+
             default:
                 nextTurn();
         }
@@ -202,7 +222,19 @@ function newConnection(socket){
             }
         }
         if(drinkerArray.length == 0){
-            nextTurn();
+            if(programState == 'GameOver'){
+                io.sockets.emit('reset', 'NOTHINGUSEFUL');
+                programState = 'Lobby';
+                console.log('Game Over : Resetting');
+                currentTurn = 0;
+                previousTurn = 0;
+                cardDeck.resetDeck();
+                cardDeck.shuffleDeck();
+                drinkerArray = [];
+                kingsRemaining = 4;
+            } else {
+                nextTurn();
+            }
         }
     });
 
@@ -223,6 +255,7 @@ function newConnection(socket){
             cardDeck.resetDeck();
             cardDeck.shuffleDeck();
             drinkerArray = [];
+            kingsRemaining = 4;
         }
     });
     
@@ -238,7 +271,6 @@ function nextTurn(){
     io.to(`${userArray[currentTurn].ID}`).emit('yourTurn',userArray[currentTurn].lastCard);
     previousTurn = currentTurn;
     currentTurn = (currentTurn+1)%userArray.length;
-
 }
 
 function sendDrink(playerID){
@@ -248,7 +280,6 @@ function sendDrink(playerID){
         io.to(`${playerID}`).emit('drink',false); // false because not drinking as a mate
         drinkerArray.push(playerID);
     }
-   
 
     for(var i = 0; i<userArray.length; i++){
         if(userArray[i].ID == playerID){

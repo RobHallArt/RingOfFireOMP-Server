@@ -28,7 +28,8 @@
     // (DONE)don't beginClick on people who are already mates.
     // (DONE)server side make a function to convert ID to username and use it to make console logs better.
     // ()Graceful Ending.
-    // ()Disconnecting Players also erase any relevant outstanding drinks in drinkerArray.
+    // (DONE)Disconnecting Players also erase any relevant outstanding drinks in drinkerArray.
+    // ()EVENTUALLY PEOPLE JOING LATE SHOULD BE ABLE TO WATCH AND JOIN IN AT THE END.
     // ()stop user connecting once in game mode.
     // (DONE)Add more explanatory titles such as picking someone to drink or picking someone to mate.
     // ()on phone version we don't actually need to show everyone, just that person who is currently active.
@@ -57,6 +58,8 @@ var userArray = [];
 var userSpriteArray = [];
 
 var programState = "Connect";
+
+var lastCard = false;
 
 /*
 
@@ -94,6 +97,14 @@ socket.on('connect', () => {
 
     socket.on('yourTurn', turnHandler);
 
+    socket.on('reset',(data)=>{
+        location.reload();
+    });
+
+    socket.on('lastCard',(data)=>{
+        lastCard = true;
+    });
+
     socket.on('programStateUpdate',(data)=>{
         
         programStateChange(data);
@@ -102,7 +113,7 @@ socket.on('connect', () => {
 
     socket.on('drink',(becauseOfMate)=>{
         drinkAnim.go();
-    })
+    });
     
 });
 
@@ -270,7 +281,11 @@ var cardButton = {
                 break;
 
             case 'K':
-                this.instructionText.text = 'Something\ninstead of\nPour...';
+                if(!lastCard){
+                    this.instructionText.text = 'Something\ninstead of\nPour...';
+                } else {
+                    this.instructionText.text = 'Last Card!';
+                }
                 break;
         }
 
@@ -541,6 +556,7 @@ function turnHandler(cardID){
 
     // maybe blur everything behind button (write a function for this elsewhere) // doing this later
     // draw Your turn somewhere
+
     cardHandler.init(cardID);
     cardButton.setCard(cardID);
     pickCardButton.enable();// enable pick card button
