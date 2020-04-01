@@ -2,7 +2,7 @@ var express = require('express');
 var socket = require('socket.io');
 
 var app = express();
-var server = app.listen(3000);
+var server = app.listen(80);
 var io = socket(server);
 
 //var os = require( 'os' );
@@ -69,7 +69,7 @@ var cardDeck = {
 var drinkerArray = [];
 
 app.use(express.static('public'));
-console.log("Listening on 3000");
+console.log("Listening on 80");
 //for(var i = 0; i<networkInterfaces.en1.length;i++){
 //    console.log( networkInterfaces.en1[i].address );
 //}

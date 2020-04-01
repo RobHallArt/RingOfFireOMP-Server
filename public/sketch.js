@@ -67,7 +67,7 @@ Game - Responding to server kicking off actions on individual players.
 
 */
 
-const socket = io.connect('54.194.90.20:3000');
+const socket = io.connect(window.location.href);
 
 socket.on('connect', () => {
 
