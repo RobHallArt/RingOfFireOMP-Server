@@ -243,8 +243,18 @@ function newConnection(socket){
         for(var i = 0; i<userArray.length; i++){
             if(userArray[i].ID == socket.id){
                 console.log('userLost', userArray[i].nickname);
+                
+                if(userArray[i].isActive){
+                    nextTurn();
+                }
+                for(var j = 0; j<drinkerArray.length; j++){
+                    if(drinkerArray[j] == userArray[i].ID){
+                        drinkerArray.splice(j,1);
+                    }
+                }
                 io.sockets.emit('userLost', socket.id);
                 userArray.splice(i,1);
+                io.sockets.emit('usersUpdate',userArray);
             }
         }
         if(userArray.length == 0){
